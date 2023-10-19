@@ -15,7 +15,7 @@ class Forest:
         self.rain = None
         self.lightning = None
 
-    def regenerate_forest(self, probability_of_rain, probability_of_lightning, highest_temperature, display_f=True):
+    def regenerate_forest(self, probability_of_rain, probability_of_lightning, highest_temperature):
         def plot_state(inputs, labels):
             #green = px.colors.qualitative.Set2[4]
             #red = px.colors.qualitative.Set1[0]
@@ -39,43 +39,23 @@ class Forest:
                                 hovertemplate = 'Coordinate: %{x},%{y}<br>'+'%{text}<extra></extra>',
             ))
             
-            if display_f:
-              fig.update_layout(
-                  autosize=True,
-                  width=800,
-                  height=800,
-                  plot_bgcolor="#fff",
-                  hoverlabel=dict(
-                      bgcolor="white",
-                      font_size=15,
-                  ),
-                  title={
-                      'text': "Simulation of Forest Wildfires",
-                      'x':0.46,
-                      'xanchor': 'center',
-                      'yanchor': 'top',
-                      'font': dict(size=30)
-                  },
-              )
-            else:
-              fig.update_layout(
+            fig.update_layout(
                 autosize=True,
-                width=10,
-                height=10,
+                width=800,
+                height=800,
                 plot_bgcolor="#fff",
                 hoverlabel=dict(
                     bgcolor="white",
-                    font_size=1,
+                    font_size=15,
                 ),
                 title={
                     'text': "Simulation of Forest Wildfires",
                     'x':0.46,
                     'xanchor': 'center',
                     'yanchor': 'top',
-                    'font': dict(size=2)
+                    'font': dict(size=30)
                 },
             )
-
             return fig
             
         def generate_specific_forest_conditions(size_of_x, size_of_y, probability_of_rain, probability_of_lightning, highest_temperature):
@@ -148,7 +128,7 @@ class Forest:
         output = widgets.interactive_output(self.regenerate_forest, {'probability_of_rain': probability_of_rain,
                                                                     'probability_of_lightning': probability_of_lightning,
                                                                     'highest_temperature': highest_temperature})
-        self.regenerate_forest(probability_of_rain.value, probability_of_lightning.value, highest_temperature.value, display_f=False)
+        
         widget = widgets.GridBox([widgets.GridBox([HBox([Label('Probability of Rain'), probability_of_rain]),
                                                    HBox([Label('Probability of Lightning'), probability_of_lightning]),
                                                    HBox([Label('Highest Temperature'), highest_temperature])]), output])
