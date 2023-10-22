@@ -161,4 +161,4 @@ class Forest:
         return bool(self.rain[y_coordinate, x_coordinate])
         
     def get_temperature(self, x_coordinate, y_coordinate):
-        return bool(self.temperature[y_coordinate, x_coordinate])
+        return self.temperature[y_coordinate, x_coordinate]
