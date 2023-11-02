@@ -164,4 +164,3 @@ class Forest:
         
     def get_temperature(self, x_coordinate, y_coordinate):
         return self.temperature[y_coordinate, x_coordinate]
-
