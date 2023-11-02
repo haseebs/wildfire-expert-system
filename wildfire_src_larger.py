@@ -26,12 +26,13 @@ class Forest:
                                 z=inputs,
                                 text=labels,
                                 texttemplate="",#"%{text}",
-                                textfont={"size":12},
+                                textfont={"size":30},
                                 xgap=1,
                                 ygap=1,
                                 colorscale=[(0.00, green),   (0.5, green),
                                         (0.5, red),  (1.00, red)],
                                 colorbar=dict(
+                                    tickfont={"size":20},
                                     tickmode="array",
                                     tickvals=[0, 0.25, 0.75, 1],
                                     ticktext=["", "Not Burning", "Burning", ""],
@@ -42,7 +43,7 @@ class Forest:
             if display_f:
               fig.update_layout(
                   autosize=True,
-                  width=800,
+                  width=900,
                   height=800,
                   plot_bgcolor="#fff",
                   hoverlabel=dict(
@@ -88,6 +89,7 @@ class Forest:
             for idx in range(len(temperature)):
                 temperature[idx] = np.convolve(temperature[idx], [0.25,0.25,0.25,0.25], mode='same')
             temperature += highest_temperature - np.max(temperature)
+            temperature = np.flip(temperature).T
             return lightning, rain, temperature
             
         def construct_annotation_matrix(lightning, rain, temperature):
@@ -116,8 +118,8 @@ class Forest:
                     wildfires[i][j] = is_area_on_fire(i, j, lightning, rain, temperature)
             return wildfires
             
-        self.lightning, self.rain, self.temperature = generate_specific_forest_conditions(size_of_x=50,
-                                                                                           size_of_y=50,
+        self.lightning, self.rain, self.temperature = generate_specific_forest_conditions(size_of_x=35,
+                                                                                           size_of_y=35,
                                                                                            probability_of_rain=probability_of_rain,
                                                                                            probability_of_lightning=probability_of_lightning,
                                                                                            highest_temperature=highest_temperature)
@@ -161,4 +163,5 @@ class Forest:
         return bool(self.rain[y_coordinate, x_coordinate])
         
     def get_temperature(self, x_coordinate, y_coordinate):
-        return bool(self.temperature[y_coordinate, x_coordinate])
+        return self.temperature[y_coordinate, x_coordinate]
+
