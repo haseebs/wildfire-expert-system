@@ -142,7 +142,7 @@ class Drawer:
         canvas.fill_style = "#000000"
         canvas.font = "30px helvetica"
         
-        with hold_canvas():
+        with hold_canvas(canvas):
             center_align = 400
             canvas.stroke_line(1100+1, center_align, 1400, center_align)
             canvas.stroke_line(1400-10, center_align+10, 1400, center_align)
@@ -151,7 +151,7 @@ class Drawer:
             canvas.font = "18px Comic Sans MS"
             canvas.fill_text("Click on the forest to view details here", 1500, 400)
     
-        with hold_canvas():
+        with hold_canvas(canvas):
             for _ in range(1000):
                 canvas.save()
                 sprite = sprites[2]
