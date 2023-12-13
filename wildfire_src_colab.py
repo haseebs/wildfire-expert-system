@@ -3,7 +3,7 @@ import ipywidgets as widgets
 from ipywidgets import HBox, Label, Image, Output, interact, interact_manual, GridspecLayout
 from ipycanvas import Canvas, hold_canvas
 from ipycanvas import RoughCanvas as Canvas
-from IPython.display import HTML, display, clear_output
+from IPython.display import HTML, clear_output
 
 from random import choice, randint, uniform
 
