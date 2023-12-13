@@ -278,6 +278,36 @@ class Drawer:
         #display(canvas)
         return canvas
 
+    def draw_canvas_without_controls(self, forest, canvas_size_x = 800//2, canvas_size_y = 800//2, size_x = 20, size_y = 20):
+        grid = GridspecLayout(20, 10)
+        display(grid)
+        temperature_input = widgets.FloatSlider(min=0,
+                                      max=100,
+                                      #description="Probability of Lightning Strike" ,
+                                      disabled=False,
+                                      orientation='horizontal',
+                                      readout=True,
+                                      step=1,
+                                      value=0,
+                                      #style={"handle_color": color[i]},
+                                      layout=widgets.Layout(width='200px'))
+
+        lightning_input = widgets.Dropdown(value="No", options=["No", "Yes"], layout=widgets.Layout(width="200px", padding="0px"))
+        rain_shadow_input = widgets.Dropdown(value="No", options=["No", "Yes"], layout=widgets.Layout(width="200px", padding="0px"))
+
+        predictions = np.random.randint(2, size=forest.wildfires.shape)
+        canvas = self.draw_canvas(forest, 
+                                  canvas_size_x=canvas_size_x, 
+                                  canvas_size_y=canvas_size_y, 
+                                  size_x=20, 
+                                  size_y=20, 
+                                  draw_predictions=False,
+                                  predictions=predictions,
+                                  lightning_input=lightning_input,
+                                  temperature_input=temperature_input,
+                                  rain_shadow_input=rain_shadow_input)
+
+        grid[5:, 1:6] = canvas
 
     def draw_canvas_with_controls(self, forest, canvas_size_x = 800//2, canvas_size_y = 800//2, size_x = 20, size_y = 20,
                                   temperature_value=0, lightning_value="No", rain_shadow_value="No"):
@@ -311,30 +341,30 @@ class Drawer:
 
         grid[5:, 1:6] = canvas
         
-        grid[0,1:5] = widgets.HBox(
-                [widgets.Label("A wildfire will occur if an area meets the following two conditions:", style={"text_color":"black", "font_weight":"bold", "font_size":"30px"})
+        grid[0,1:7] = widgets.HBox(
+                [widgets.HTML("<h1>A wildfire will occur if an area meets the following two conditions:</h1>", style={"text_color":"black", "font_weight":"bold", "font_size":"50px"})
                 ], layout=widgets.Layout(align_items="center", justify_content="space-between"))
         
-        grid[1,1:3] = widgets.HBox(
-                [widgets.Label("Lightning Strike Occurence: ", style={"text_color":"black", "font_weight":"bold", "font_size":"20px"}),
+        grid[1,1:4] = widgets.HBox(
+                [widgets.HTML("<h3>Lightning Strike Occurence: </h3>", style={"text_color":"black", "font_weight":"bold", "font_size":"20px"}),
                  lightning_input
                 ], layout=widgets.Layout(align_items="center", justify_content="space-between"))
         
         grid[2,1:3] = widgets.HBox(
-                [widgets.Label("OR", style={"text_color":"red", "font_weight":"bold", "font_size":"30px"})
+                [widgets.HTML("<h3>OR</h3>", style={"text_color":"red", "font_weight":"bold", "font_size":"30px"})
                 ], layout=widgets.Layout(align_items="center", justify_content="flex-start"))
         
-        grid[3,1:3] = widgets.HBox(
-                [widgets.Label("Rain-Shadow: ", style={"text_color":"black", "font_weight":"bold", "font_size":"20px"}),
+        grid[3,1:4] = widgets.HBox(
+                [widgets.HTML("<h3>Rain-Shadow: </h3>", style={"text_color":"black", "font_weight":"bold", "font_size":"20px"}),
                  rain_shadow_input,
                 ], layout=widgets.Layout(align_items="center", justify_content="space-between"))
         
-        grid[3,3] = widgets.HBox(
-                [widgets.Label("AND", style={"text_color":"red", "font_weight":"bold", "font_size":"30px"})
+        grid[3,4] = widgets.HBox(
+                [widgets.HTML("<h3>AND</h3>", style={"text_color":"red", "font_weight":"bold", "font_size":"30px"})
                 ], layout=widgets.Layout(align_items="center", justify_content="center"))
         
-        grid[3,4:6] = widgets.HBox(
-                [widgets.Label("Temperature is greater than: ", style={"text_color":"black", "font_weight":"bold", "font_size":"20px"}),
+        grid[3,5:8] = widgets.HBox(
+                [widgets.HTML("<h3>Temperature is greater than: </h3>", style={"text_color":"black", "font_weight":"bold", "font_size":"20px"}),
                  temperature_input
                 ], layout=widgets.Layout(align_items="center", justify_content="space-between"))
         
@@ -350,4 +380,4 @@ class Drawer:
 
         button.on_click(on_button_clicked)
         grid[4,1:4] =button     
-        return grid
+        #return grid
