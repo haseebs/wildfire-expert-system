@@ -280,7 +280,6 @@ class Drawer:
 
     def draw_canvas_without_controls(self, forest, canvas_size_x = 800//2, canvas_size_y = 800//2, size_x = 20, size_y = 20):
         grid = GridspecLayout(20, 10)
-        display(grid)
         temperature_input = widgets.FloatSlider(min=0,
                                       max=100,
                                       #description="Probability of Lightning Strike" ,
@@ -308,11 +307,11 @@ class Drawer:
                                   rain_shadow_input=rain_shadow_input)
 
         grid[5:, 1:6] = canvas
+        display(grid)
 
     def draw_canvas_with_controls(self, forest, canvas_size_x = 800//2, canvas_size_y = 800//2, size_x = 20, size_y = 20,
                                   temperature_value=0, lightning_value="No", rain_shadow_value="No"):
         grid = GridspecLayout(20, 10)
-        display(grid)
         temperature_input = widgets.FloatSlider(min=0,
                                       max=100,
                                       #description="Probability of Lightning Strike" ,
@@ -380,4 +379,5 @@ class Drawer:
 
         button.on_click(on_button_clicked)
         grid[4,1:4] =button     
+        display(grid)
         #return grid
