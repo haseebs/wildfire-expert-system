@@ -80,7 +80,7 @@ class Forest:
     def is_lightning(self, x_coordinate, y_coordinate):
         return bool(self.lightning[y_coordinate, x_coordinate])
         
-    def is_raining(self, x_coordinate, y_coordinate):
+    def is_rainshadow(self, x_coordinate, y_coordinate):
         return bool(self.rain[y_coordinate, x_coordinate])
         
     def get_temperature(self, x_coordinate, y_coordinate):
@@ -234,9 +234,9 @@ class Drawer:
         out = Output()
         @out.capture()
         def handle_mouse_down(x, y):
-            x = x-100
-            y = y-100
-            coord_x = int(size_x*(x-200)/canvas_size_x)
+            x = x-50
+            y = y-50
+            coord_x = int(size_x*(x-100)/canvas_size_x)
             coord_y = int(size_y*y/canvas_size_y)
             if coord_x > size_x-1 or coord_y > size_y-1 or coord_x < 0 or coord_y < 0:
                 return
