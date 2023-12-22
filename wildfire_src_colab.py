@@ -247,7 +247,7 @@ class Drawer:
             else:
                 annotation += "not burning."
             annotation += f'The temperature is {forest.get_temperature(coord_x, coord_y)}°C.It is '
-            if forest.is_raining(coord_x, coord_y):
+            if forest.is_rainshadow(coord_x, coord_y):
                 annotation += 'raining.There are '
             else:
                 annotation += 'not raining.There are '
