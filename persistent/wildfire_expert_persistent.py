@@ -1,3 +1,91 @@
+import numpy as np
+import ipywidgets as widgets
+from ipywidgets import HBox, Label, Image, Output, interact, interact_manual, GridspecLayout
+from ipycanvas import Canvas, hold_canvas
+from ipycanvas import RoughCanvas as Canvas
+from IPython.display import HTML, clear_output
+
+from random import choice, randint, uniform
+
+
+global lightning
+global rain
+global temperature
+
+class Forest:
+    def __init__(self):
+        self.temperature = None
+        self.rain = None
+        self.lightning = None
+        self.wildfires = None
+        size_x = 20
+        size_y = 20
+        self.construct_wildfire_matrix(size_x, size_y, probability_of_rain=0.4, probability_of_lightning=0.2, highest_temperature=90)
+
+    def generate_specific_forest_conditions(self, size_of_x, size_of_y, probability_of_rain, probability_of_lightning, highest_temperature):
+        random_number_generator = np.random.default_rng()
+        lightning = random_number_generator.binomial(n=1, p=probability_of_lightning, size=(size_of_x, size_of_y))
+        rain = random_number_generator.binomial(n=1, p=probability_of_rain, size=(size_of_x, size_of_y))
+        lowest_temperature_vector = random_number_generator.normal(0, 1, size=(size_of_x)) * 10
+        highest_temperature_vector = lowest_temperature_vector + highest_temperature - max(lowest_temperature_vector)
+        temperature = np.linspace(start=lowest_temperature_vector, stop=highest_temperature_vector, num=size_of_x, dtype=int)
+        for idx in range(len(temperature)):
+            temperature[idx] = np.convolve(temperature[idx], [0.25,0.25,0.25,0.25], mode='same')
+        temperature += highest_temperature - np.max(temperature)
+        #temperature = np.flip(temperature).T
+        return lightning, rain, temperature
+        
+    def construct_annotation_matrix(self, lightning, rain, temperature):
+        annotations = np.empty_like(lightning, dtype='<U48')
+        for i in range(annotations.shape[0]):
+            for j in range(annotations.shape[1]):
+                raining_txt = "True" if rain[i][j] else "False"
+                lightning_txt = "True" if lightning[i][j] else "False"
+                annotations[i][j] = 'Rain: ' +  raining_txt +\
+                                    '<br>Temp: ' + str(temperature[i][j]) +\
+                                    '<br>Lightning: ' + lightning_txt
+        return annotations
+        
+    def construct_wildfire_matrix(self, size_x, size_y, probability_of_rain = 0.3, probability_of_lightning = 0.4, highest_temperature=85):
+        self.lightning, self.rain, self.temperature = self.generate_specific_forest_conditions(size_of_x=size_x,
+                                                                               size_of_y=size_y,
+                                                                               probability_of_rain=probability_of_rain,
+                                                                               probability_of_lightning=probability_of_lightning,
+                                                                               highest_temperature=highest_temperature)
+
+        def is_area_on_fire(x_coordinate, y_coordinate, lightning, rain, temperature):
+            if lightning[x_coordinate, y_coordinate] == True:
+                area_on_fire = True
+            elif temperature[x_coordinate, y_coordinate] > 55 and rain[x_coordinate, y_coordinate] == True:
+                area_on_fire = True
+            else:
+                area_on_fire = False
+            return area_on_fire
+        wildfires = np.empty_like(self.lightning)
+        for i in range(wildfires.shape[0]):
+            for j in range(wildfires.shape[1]):
+                wildfires[i][j] = is_area_on_fire(i, j, self.lightning, self.rain, self.temperature)
+        self.wildfires = wildfires
+        return wildfires
+
+    def predict_area_on_fire(self, x_coordinate, y_coordinate, lightning_value, temp_value, rain_value):
+        if bool(self.lightning[x_coordinate, y_coordinate]) == (lightning_value == "Yes"):
+            area_on_fire = True
+        elif self.temperature[x_coordinate, y_coordinate] > temp_value and bool(self.rain[x_coordinate, y_coordinate]) == (rain_value == "Yes"):
+            area_on_fire = True
+        else:
+            area_on_fire = False
+        return area_on_fire
+        
+    def is_lightning(self, x_coordinate, y_coordinate):
+        return bool(self.lightning[y_coordinate, x_coordinate])
+        
+    def is_rainshadow(self, x_coordinate, y_coordinate):
+        return bool(self.rain[y_coordinate, x_coordinate])
+        
+    def get_temperature(self, x_coordinate, y_coordinate):
+        return self.temperature[y_coordinate, x_coordinate]
+
 
 class Drawer:
     def __init__(self, sprite_locations):
