@@ -169,6 +169,12 @@ class Drawer:
         self.canvas.on_mouse_down(handle_mouse_down)
         return self.canvas
 
+    def clr_canvas(self):
+        self.canvas.clear()
+        self.canvas.fill_style = '#FFFFFF'
+        self.canvas.fill_rect(0, 0, width=1500, height=1000//2)
+
+
     def draw_canvas_without_controls(self, forest, canvas_size_x = 800//2, canvas_size_y = 800//2, size_x = 20, size_y = 20):
         grid = GridspecLayout(20, 10)
         temperature_input = widgets.FloatSlider(min=0,
@@ -273,6 +279,7 @@ class Drawer:
         button = widgets.Button(description="Click to predict!")
         def on_button_clicked(b):
             clear_output(wait=True)
+            self.clr_canvas()
 
             self.draw_canvas_with_controls(forest,
                                            temperature_value=temperature_input.value,
