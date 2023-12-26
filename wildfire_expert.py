@@ -280,7 +280,7 @@ class Drawer:
                                            rain_shadow_value=rain_shadow_input.value)
 
         button.on_click(on_button_clicked)
-        grid[4,1:4] = button
+        grid[5,1:4] = button
         display(grid)
         # redraw everything because it doesn't always work when drawing only once :((
         with hold_canvas(self.canvas):
