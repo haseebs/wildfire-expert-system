@@ -276,7 +276,7 @@ class Drawer:
                 ], layout=widgets.Layout(align_items="center", justify_content="space-between"))
 
 
-        button = widgets.Button(description="Click to anticipate wildfires!")
+        button = widgets.Button(description="Click to anticipate!")
         def on_button_clicked(b):
             clear_output(wait=True)
             self.clr_canvas()
