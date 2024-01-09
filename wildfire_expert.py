@@ -218,8 +218,6 @@ class Drawer:
                                          probability_of_lightning=lightning_input.value/100,
                                          highest_temperature=temperature_input.value)
 
-        print(rain_shadow_input.value/100, lightning_input.value/100, temperature_input.value)
-
         self.draw_canvas(forest,
                           canvas_size_x=canvas_size_x,
                           canvas_size_y=canvas_size_y,
