@@ -235,18 +235,18 @@ class Drawer:
                 [widgets.HTML("<h1>Adjust the conditions of the forest below:</h1>", style={"text_color":"black", "font_weight":"bold", "font_size":"50px"})
                 ], layout=widgets.Layout(align_items="center", justify_content="space-between"))
 
-        grid[2,1:4] = widgets.HBox(
+        grid[2,1:8] = widgets.HBox(
             [widgets.HTML("<h3>Chance of Lightning Strikes occuring (%): </h3>", style={"text_color":"black", "font_weight":"bold", "font_size":"20px"}),
                  lightning_input
                 ], layout=widgets.Layout(align_items="center", justify_content="space-between"))
 
 
-        grid[3,1:4] = widgets.HBox(
+        grid[3,1:8] = widgets.HBox(
                 [widgets.HTML("<h3>Chance of Rainfall (%): </h3>", style={"text_color":"black", "font_weight":"bold", "font_size":"20px"}),
                  rain_shadow_input,
                 ], layout=widgets.Layout(align_items="center", justify_content="space-between"))
 
-        grid[4,1:4] = widgets.HBox(
+        grid[4,1:8] = widgets.HBox(
                 [widgets.HTML("<h3>Temperature of Hottest Area (F): </h3>", style={"text_color":"black", "font_weight":"bold", "font_size":"20px"}),
                  temperature_input
                 ], layout=widgets.Layout(align_items="center", justify_content="space-between"))
