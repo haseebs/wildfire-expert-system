@@ -26,13 +26,14 @@ class Forest:
         random_number_generator = np.random.default_rng()
         lightning = random_number_generator.binomial(n=1, p=probability_of_lightning, size=(size_of_x, size_of_y))
         rain = random_number_generator.binomial(n=1, p=probability_of_rain, size=(size_of_x, size_of_y))
+        rain[:,0:3] = 0
         lowest_temperature_vector = random_number_generator.normal(0, 1, size=(size_of_x)) * 10
         highest_temperature_vector = lowest_temperature_vector + highest_temperature - max(lowest_temperature_vector)
         temperature = np.linspace(start=lowest_temperature_vector, stop=highest_temperature_vector, num=size_of_x, dtype=int)
         for idx in range(len(temperature)):
             temperature[idx] = np.convolve(temperature[idx], [0.25,0.25,0.25,0.25], mode='same')
         temperature += highest_temperature - np.max(temperature)
-        #temperature = np.flip(temperature).T
+        temperature = np.flip(temperature).T
         return lightning, rain, temperature
         
     def construct_annotation_matrix(self, lightning, rain, temperature):
@@ -56,7 +57,7 @@ class Forest:
         def is_area_on_fire(x_coordinate, y_coordinate, lightning, rain, temperature):
             if lightning[x_coordinate, y_coordinate] == True:
                 area_on_fire = True
-            elif temperature[x_coordinate, y_coordinate] > 55 and rain[x_coordinate, y_coordinate] == True:
+            elif temperature[x_coordinate, y_coordinate] > 55 and rain[x_coordinate, y_coordinate] == False:
                 area_on_fire = True
             else:
                 area_on_fire = False
@@ -71,7 +72,7 @@ class Forest:
     def predict_area_on_fire(self, x_coordinate, y_coordinate, lightning_value, temp_value, rain_value):
         if bool(self.lightning[x_coordinate, y_coordinate]) == (lightning_value == "Yes"):
             area_on_fire = True
-        elif self.temperature[x_coordinate, y_coordinate] > temp_value and bool(self.rain[x_coordinate, y_coordinate]) == (rain_value == "Yes"):
+        elif self.temperature[x_coordinate, y_coordinate] > temp_value and bool(self.rain[x_coordinate, y_coordinate]) == (rain_value == "No"):
             area_on_fire = True
         else:
             area_on_fire = False
@@ -90,7 +91,7 @@ class Drawer:
     def __init__(self, sprite_locations):
         self.sprite_locations  = sprite_locations
         self.canvas = Canvas(width=1500, height=1000//2, sync_image_data=True)
-        self.forest_image = Image.from_file("forest.png")
+        self.forest_image = Image.from_file("forestnofire.png")
 
     def draw_canvas(self,
                     forest,
@@ -140,9 +141,9 @@ class Drawer:
                 annotation += "not burning."
             annotation += f'The temperature is {forest.get_temperature(coord_x, coord_y)}°F.It is '
             if forest.is_rainshadow(coord_x, coord_y):
-                annotation += 'a rainshadow area.There are '
+                annotation += 'raining in this area.There are '
             else:
-                annotation += 'not a rainshadow area.There are '
+                annotation += 'not raining in this area.There are '
             if forest.is_lightning(coord_x, coord_y):
                 annotation += 'lightning strikes in the area.'
             else:
@@ -175,46 +176,11 @@ class Drawer:
         self.canvas.fill_rect(0, 0, width=1500, height=1000//2)
 
 
-    def draw_canvas_without_controls(self, forest, canvas_size_x = 800//2, canvas_size_y = 800//2, size_x = 20, size_y = 20):
-        grid = GridspecLayout(20, 10)
-        temperature_input = widgets.FloatSlider(min=0,
-                                      max=100,
-                                      #description="Probability of Lightning Strike" ,
-                                      disabled=False,
-                                      orientation='horizontal',
-                                      readout=True,
-                                      step=1,
-                                      value=0,
-                                      #style={"handle_color": color[i]},
-                                      layout=widgets.Layout(width='200px'))
-
-        lightning_input = widgets.Dropdown(value="No", options=["No", "Yes"], layout=widgets.Layout(width="200px", padding="0px"))
-        rain_shadow_input = widgets.Dropdown(value="No", options=["No", "Yes"], layout=widgets.Layout(width="200px", padding="0px"))
-
-        predictions = np.random.randint(2, size=forest.wildfires.shape)
-        self.draw_canvas(forest,
-                          canvas_size_x=canvas_size_x,
-                          canvas_size_y=canvas_size_y,
-                          size_x=20,
-                          size_y=20,
-                          draw_predictions=False,
-                          predictions=predictions,
-                          lightning_input=lightning_input,
-                          temperature_input=temperature_input,
-                          rain_shadow_input=rain_shadow_input)
-
-        grid[6:, 1:6] = self.canvas
-        display(grid)
-
-        # redraw everything because it doesn't always work when drawing only once :((
-        self.canvas.draw_image(self.forest_image)
-
-
     def draw_canvas_with_controls(self, forest, canvas_size_x = 800//2, canvas_size_y = 800//2, size_x = 20, size_y = 20,
-                                  temperature_value=0, lightning_value="No", rain_shadow_value="No"):
+                                  temperature_value=0, lightning_value=0, rain_shadow_value=0):
         grid = GridspecLayout(20, 10)
-        temperature_input = widgets.FloatSlider(min=0,
-                                      max=100,
+        temperature_input = widgets.IntSlider(min=40,
+                                      max=150,
                                       #description="Probability of Lightning Strike" ,
                                       disabled=False,
                                       orientation='horizontal',
@@ -223,17 +189,36 @@ class Drawer:
                                       value=temperature_value,
                                       #style={"handle_color": color[i]},
                                       layout=widgets.Layout(width='200px'))
+        lightning_input = widgets.FloatSlider(min=0,
+                                      max=100,
+                                      #description="Probability of Lightning Strike" ,
+                                      disabled=False,
+                                      orientation='horizontal',
+                                      readout=True,
+                                      step=1,
+                                      value=lightning_value,
+                                      #style={"handle_color": color[i]},
+                                      layout=widgets.Layout(width='200px'))
+        
+        rain_shadow_input = widgets.FloatSlider(min=0,
+                                      max=100,
+                                      #description="Probability of Lightning Strike" ,
+                                      disabled=False,
+                                      orientation='horizontal',
+                                      readout=True,
+                                      step=1,
+                                      value=rain_shadow_value,
+                                      #style={"handle_color": color[i]},
+                                      layout=widgets.Layout(width='200px'))
 
-        lightning_input = widgets.Dropdown(value=lightning_value, options=["No", "Yes"], layout=widgets.Layout(width="200px", padding="0px"))
-        rain_shadow_input = widgets.Dropdown(value=rain_shadow_value, options=["No", "Yes"], layout=widgets.Layout(width="200px", padding="0px"))
 
-        predictions = np.random.randint(2, size=forest.wildfires.shape)
-        for i in range(predictions.shape[0]):
-            for j in range(predictions.shape[1]):
-                if forest.predict_area_on_fire(i, j, lightning_input.value, temperature_input.value, rain_shadow_input.value) != forest.wildfires[i][j]:
-                    predictions[i][j] = 1
-                else:
-                    predictions[i][j] = 0
+        forest.construct_wildfire_matrix(size_x=20,
+                                         size_y=20,
+                                         probability_of_rain=rain_shadow_input.value/100, 
+                                         probability_of_lightning=lightning_input.value/100,
+                                         highest_temperature=temperature_input.value)
+
+        print(rain_shadow_input.value/100, lightning_input.value/100, temperature_input.value)
 
         self.draw_canvas(forest,
                           canvas_size_x=canvas_size_x,
@@ -241,7 +226,7 @@ class Drawer:
                           size_x=20,
                           size_y=20,
                           draw_predictions=True,
-                          predictions=predictions,
+                          predictions=forest.wildfires,
                           lightning_input=lightning_input,
                           temperature_input=temperature_input,
                           rain_shadow_input=rain_shadow_input)
@@ -249,34 +234,27 @@ class Drawer:
         grid[6:, 1:6] = self.canvas
 
         grid[1,1:7] = widgets.HBox(
-                [widgets.HTML("<h1>A wildfire will occur if an area meets the following two conditions:</h1>", style={"text_color":"black", "font_weight":"bold", "font_size":"50px"})
+                [widgets.HTML("<h1>Adjust the conditions of the forest below:</h1>", style={"text_color":"black", "font_weight":"bold", "font_size":"50px"})
                 ], layout=widgets.Layout(align_items="center", justify_content="space-between"))
 
         grid[2,1:4] = widgets.HBox(
-                [widgets.HTML("<h3>Lightning Strike Occurence: </h3>", style={"text_color":"black", "font_weight":"bold", "font_size":"20px"}),
+                [widgets.HTML("<h3>Chance of Lightning Strikes occuring </h3>", style={"text_color":"black", "font_weight":"bold", "font_size":"20px"}),
                  lightning_input
                 ], layout=widgets.Layout(align_items="center", justify_content="space-between"))
 
-        grid[3,1:3] = widgets.HBox(
-                [widgets.HTML("<h3>OR</h3>", style={"text_color":"red", "font_weight":"bold", "font_size":"30px"})
-                ], layout=widgets.Layout(align_items="center", justify_content="flex-start"))
 
-        grid[4,1:4] = widgets.HBox(
-                [widgets.HTML("<h3>Rain-Shadow: </h3>", style={"text_color":"black", "font_weight":"bold", "font_size":"20px"}),
+        grid[3,1:4] = widgets.HBox(
+                [widgets.HTML("<h3>Chance of Rainfall: </h3>", style={"text_color":"black", "font_weight":"bold", "font_size":"20px"}),
                  rain_shadow_input,
                 ], layout=widgets.Layout(align_items="center", justify_content="space-between"))
 
-        grid[4,4] = widgets.HBox(
-                [widgets.HTML("<h3>AND</h3>", style={"text_color":"red", "font_weight":"bold", "font_size":"30px"})
-                ], layout=widgets.Layout(align_items="center", justify_content="center"))
-
-        grid[4,5:8] = widgets.HBox(
-                [widgets.HTML("<h3>Temperature is greater than: </h3>", style={"text_color":"black", "font_weight":"bold", "font_size":"20px"}),
+        grid[4,1:4] = widgets.HBox(
+                [widgets.HTML("<h3>Temperature of Hottest Area: </h3>", style={"text_color":"black", "font_weight":"bold", "font_size":"20px"}),
                  temperature_input
                 ], layout=widgets.Layout(align_items="center", justify_content="space-between"))
 
 
-        button = widgets.Button(description="Click to anticipate!")
+        button = widgets.Button(description="Press to Refresh!")
         def on_button_clicked(b):
             clear_output(wait=True)
             self.clr_canvas()
@@ -297,9 +275,9 @@ class Drawer:
           self.canvas.line_width = 3.0
           self.canvas.rough_fill_style = "solid"
 
-          for i in range(predictions.shape[0]):
-              for j in range(predictions.shape[1]):
-                  if predictions[i][j]:
+          for i in range(forest.wildfires.shape[0]):
+              for j in range(forest.wildfires.shape[1]):
+                  if forest.wildfires[j][i]:
                       x, y, scale = self.sprite_locations[str([i, j])]
                       x += 50
                       y += 50
